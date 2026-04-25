@@ -1,0 +1,95 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{xcolor}
+
+\usemintedstyle{friendly}
+\setminted{
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    bgcolor=lightgray!10,
+    fontsize=\small,
+    linenos
+}
+
+\title{Spam Email Detection Using Naive Bayes Classifiers}
+\author{Machine Learning Report}
+\date{April 25, 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Email spam detection is a critical application of Natural Language Processing (NLP) and supervised learning. This report details the implementation of various Naive Bayes classifiers to distinguish between legitimate (ham) and unsolicited (spam) emails using a dataset of 5,728 labeled messages.
+
+\section{Dataset Description}
+The dataset consists of two columns: the raw email text and a binary indicator (1 for spam, 0 for ham). 
+\begin{itemize}
+    \item \textbf{Total Emails:} 5,728
+    \item \textbf{Spam Messages:} 1,368
+    \item \textbf{Ham Messages:} 4,360
+\end{itemize}
+The data was split into training and testing sets with a 50\% ratio to evaluate model performance across different Naive Bayes variants.
+
+\section{Methodology}
+
+\subsection{Data Preprocessing}
+To transform raw text into a format suitable for machine learning, several preprocessing steps were applied:
+\begin{enumerate}
+    \item \textbf{Cleaning:} Removal of non-letter characters and conversion to lowercase.
+    \item \textbf{Tokenization:} Splitting text into individual word tokens.
+    \item \textbf{Stopword Removal:} Filtering out common English words (e.g., "the", "is") that do not contribute to classification.
+    \item \textbf{Lemmatization:} Reducing words to their base or dictionary form (e.g., "winning" becomes "win") using the NLTK WordNet Lemmatizer.
+\end{enumerate}
+
+\subsection{Feature Extraction}
+We utilized the \texttt{TfidfVectorizer} (Term Frequency-Inverse Document Frequency) to convert the cleaned text into numerical vectors. The feature space was limited to the top 5,000 most frequent terms to maintain computational efficiency while capturing the most discriminative words.
+
+\section{Model Evaluation}
+Four variants of the Naive Bayes algorithm were implemented and compared:
+
+\subsection{Comparison of Accuracy}
+The models demonstrated high performance across the board, with Complement Naive Bayes (CNB) achieving the highest accuracy.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Model} & \textbf{Accuracy} \\
+        \midrule
+        Gaussian Naive Bayes & 94.90\% \\
+        Multinomial Naive Bayes & 96.54\% \\
+        Bernoulli Naive Bayes & 93.47\% \\
+        Complement Naive Bayes & \textbf{97.94\%} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Model Performance Comparison}
+\end{table}
+
+\subsection{Detailed Classification Reports}
+Below are the precision, recall, and F1-scores for the best performing model (Complement NB):
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
+        \midrule
+        0 (Ham) & 0.99 & 0.98 & 0.99 & 2150 \\
+        1 (Spam) & 0.94 & 0.98 & 0.96 & 714 \\
+        \midrule
+        \textbf{Accuracy} & & & \textbf{0.98} & 2864 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Complement Naive Bayes Metrics}
+\end{table}
+
+\section{Conclusion}
+The experimental results indicate that Naive Bayes classifiers are highly effective for spam detection tasks. While all models performed well (above 93\% accuracy), the \textbf{Complement Naive Bayes} classifier proved to be the most robust, achieving an accuracy of \textbf{97.94\%}. This suggests that handling class imbalances and normalized weights provides a significant advantage in text classification within this specific dataset.
+
+\end{document}
