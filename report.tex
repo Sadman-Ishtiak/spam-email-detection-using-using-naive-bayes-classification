@@ -5,15 +5,41 @@
 \usepackage{hyperref}
 \usepackage{minted}
 \usepackage{xcolor}
+\usepackage[most]{tcolorbox}
 
 \usemintedstyle{friendly}
 \setminted{
-    frame=lines,
     framesep=2mm,
     baselinestretch=1.2,
-    bgcolor=lightgray!10,
+    bgcolor=lightgray!5,
     fontsize=\small,
     linenos
+}
+
+% Jupyter Code Block
+\newtcblisting{jupytercode}[1]{
+    listing engine=minted,
+    minted language=#1,
+    minted options={fontsize=\small, linenos, numbersep=3mm},
+    colback=lightgray!5,
+    colframe=gray!20,
+    listing only,
+    left=5mm,
+    enhanced,
+    overlay={\node[anchor=north east, text=gray, font=\tiny\ttfamily] at (frame.north east) {In [ ]};}
+}
+
+% Jupyter Output Block
+\newtcolorbox{jupyteroutput}{
+    colback=white,
+    colframe=gray!15,
+    arc=0pt,
+    outer arc=0pt,
+    leftrule=2pt,
+    fontupper=\small\ttfamily,
+    breakable,
+    enhanced,
+    overlay={\node[anchor=north west, text=gray, font=\tiny\ttfamily] at (frame.north west) {Out:};}
 }
 
 \title{Spam Email Detection Using Naive Bayes Classifiers}
@@ -47,6 +73,18 @@ To transform raw text into a format suitable for machine learning, several prepr
     \item \textbf{Lemmatization:} Reducing words to their base or dictionary form (e.g., "winning" becomes "win") using the NLTK WordNet Lemmatizer.
 \end{enumerate}
 
+\begin{jupytercode}{python}
+def preprocess_spam(text):
+    # Clean: Remove non-letters & lowercase
+    text = re.sub(r'[^a-zA-Z]', ' ', text).lower()
+    # Tokenize: Split into words
+    words = text.split()
+    # Lemmatize & Remove Stopwords
+    clean_words = [lemmatizer.lemmatize(w) for w in words 
+                   if w not in stop_words]
+    return " ".join(clean_words)
+\end{jupytercode}
+
 \subsection{Feature Extraction}
 We utilized the \texttt{TfidfVectorizer} (Term Frequency-Inverse Document Frequency) to convert the cleaned text into numerical vectors. The feature space was limited to the top 5,000 most frequent terms to maintain computational efficiency while capturing the most discriminative words.
 
@@ -72,22 +110,28 @@ The models demonstrated high performance across the board, with Complement Naive
 \end{table}
 
 \subsection{Detailed Classification Reports}
-Below are the precision, recall, and F1-scores for the best performing model (Complement NB):
+Below is the execution output for the best performing model (Complement NB):
 
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{lcccc}
-        \toprule
-        \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
-        \midrule
-        0 (Ham) & 0.99 & 0.98 & 0.99 & 2150 \\
-        1 (Spam) & 0.94 & 0.98 & 0.96 & 714 \\
-        \midrule
-        \textbf{Accuracy} & & & \textbf{0.98} & 2864 \\
-        \bottomrule
-    \end{tabular}
-    \caption{Complement Naive Bayes Metrics}
-\end{table}
+\begin{jupytercode}{python}
+y_pred_cnb = cnb.predict(X_test)
+print("Complement NB Accuracy:", accuracy_score(y_test, y_pred_cnb))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred_cnb))
+\end{jupytercode}
+
+\begin{jupyteroutput}
+Complement NB Accuracy: 0.9793994413407822
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.99      0.98      0.99      2150
+           1       0.94      0.98      0.96       714
+
+    accuracy                           0.98      2864
+   macro avg       0.97      0.98      0.97      2864
+weighted avg       0.98      0.98      0.98      2864
+\end{jupyteroutput}
 
 \section{Conclusion}
 The experimental results indicate that Naive Bayes classifiers are highly effective for spam detection tasks. While all models performed well (above 93\% accuracy), the \textbf{Complement Naive Bayes} classifier proved to be the most robust, achieving an accuracy of \textbf{97.94\%}. This suggests that handling class imbalances and normalized weights provides a significant advantage in text classification within this specific dataset.

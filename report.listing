@@ -1,0 +1,4 @@
+y_pred_cnb = cnb.predict(X_test)
+print("Complement NB Accuracy:", accuracy_score(y_test, y_pred_cnb))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred_cnb))
